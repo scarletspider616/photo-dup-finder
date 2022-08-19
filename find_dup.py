@@ -14,8 +14,6 @@ import sys
 import hashlib
 from collections import defaultdict
 
-from numpy import size
-
 
 def chunk_reader(fobj, chunk_size=1024):
     """ Generator that reads a file in chunks of bytes """
