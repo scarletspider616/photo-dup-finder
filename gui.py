@@ -4,6 +4,7 @@ from time import sleep
 import wx
 
 from find_dup import check_for_duplicates
+from delete_dup import delete_duplicate, delete_duplicates
 
 
 class MainWindow(wx.Frame):
@@ -13,6 +14,8 @@ class MainWindow(wx.Frame):
     size_hash_progress = None
     small_hash_progress = None
     full_hash_progress = None
+
+    delete_duplicate_progress = None
 
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title, size=(600, 600))
@@ -51,14 +54,24 @@ class MainWindow(wx.Frame):
                                                     maximum=100, parent=self, style=wx.PD_SMOOTH | wx.PD_AUTO_HIDE)
         duplicates = check_for_duplicates(self.path, size_hash_update=self.size_hash_update,
                                           small_hash_update=self.small_hash_update, full_hash_update=self.full_hash_update)
-        self.Layout()
-        if self.auto_delete_dup:
-            delete_duplicates(duplicates)
-        else:
-            pass
 
-            
+        self.delete_duplicate_progress = wx.ProgressDialog('Deleting duplicaates in progress...', 'Please wait',
+                                                               maximum=100, parent=self, style=wx.PD_SMOOTH | wx.PD_AUTO_HIDE)
+        if self.auto_delete_dup:
+            delete_duplicates(
+                duplicates, delete_duplicate_update=self.delete_duplicate_update)
+        else:
+            print('SHOW NOT YET SUPPORTED')
+            # for dup in duplicates:
+            #     # TODO get user input on if it should be deleted
+            #     delete_me = self.prompt_user_to_verify(dup.value())
+            #     if delete_me:
+            #         delete_duplicate(dup)
+
+        exit(0)
+
     # this is very hacky but this is just for fun mostly here
+
     def on_auto_delete_dup_chk(self, event):
         self.auto_delete_dup = event.GetEventObject().GetValue()
 
@@ -72,14 +85,15 @@ class MainWindow(wx.Frame):
         self.small_hash_progress.Update(int(curr_dec * 100))
 
         if curr_dec == 1 and not self.full_hash_progress:
-            self.small_hash_progress.Hide()
             self.full_hash_progress = wx.ProgressDialog('Full hashing in progress...', 'Please wait',
                                                         maximum=100, parent=self, style=wx.PD_SMOOTH | wx.PD_AUTO_HIDE)
 
     def full_hash_update(self, curr_dec):
-        if curr_dec >= 1:
-            self.full_hash_progress.Update(99)
         self.full_hash_progress.Update(int(curr_dec * 100))
+
+    def delete_duplicate_update(self, curr_dec):
+        self.delete_duplicate_progress.Update(int(curr_dec * 100))
+            
 
 
 app = wx.App(False)
