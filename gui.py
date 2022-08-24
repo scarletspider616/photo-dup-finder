@@ -68,8 +68,6 @@ class MainWindow(wx.Frame):
             #     if delete_me:
             #         delete_duplicate(dup)
 
-        exit(0)
-
     # this is very hacky but this is just for fun mostly here
 
     def on_auto_delete_dup_chk(self, event):
